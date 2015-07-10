@@ -14,7 +14,17 @@ wToparam = function(w.true){
     param.true
 }
 
-
+UpdateCount = function(dat,count){
+  dat@count = count
+  dat@nobs = sum(count)
+  if (length(dat@topq)!=1 && min(dat@topq) < dat@nobj-1){
+    dat@subobs = numeric(length(dat@topq))
+    for (i in 1:length(dat@topq)){
+      dat@subobs[i] = sum(dat@count[ dat@q_ind[i]: (dat@q_ind[i+1]-1) ])
+    }
+  }
+  dat
+}
 
 
 
@@ -26,12 +36,15 @@ AddInfo=function(solveres,dat,pi0){
     solveres
 }
 
-
+# neighbour for incomplete rankings
 SearchPi0=function(dat,init,ctrl){
     n = dat@nobj
     curr_best_ranking = init@modal_ranking.init[[1]] 
-    if (dat@topq > 0){
-        curr_best_ranking[curr_best_ranking>dat@topq+1]=dat@topq+1
+    if (ctrl@SearchPi0_show_message){
+      message("<<< initial ranking ",curr_best_ranking," >>>")
+    }
+    if (max(dat@topq) < n-1){
+        curr_best_ranking[curr_best_ranking>max(dat@topq)+1]=max(dat@topq)+1
     }
     curr_solve <- SingleClusterModel(dat,init,ctrl,curr_best_ranking)
     curr_model = AddInfo(curr_solve,dat,curr_best_ranking)
@@ -62,7 +75,7 @@ SearchPi0=function(dat,init,ctrl){
             if (tested[i]) next
             this_ranking = neighbours[i,]
             if (ctrl@SearchPi0_show_message){
-                message("Now Checking Neighbour ",this_ranking)
+                message("\tNow Checking Neighbour ",this_ranking)
             }
             this_solve <- SingleClusterModel(dat,init,ctrl,this_ranking)
             this_model = AddInfo(this_solve,dat,this_ranking)
@@ -83,6 +96,7 @@ SearchPi0=function(dat,init,ctrl){
     curr_model
 }
 
+# TODO need to change: does not work for d==1
 t.gen = function(d){
     t.lst = list()
     t.lst[[d]] = matrix(rep(1:d,d),ncol = d, nrow = d,byrow=T)
