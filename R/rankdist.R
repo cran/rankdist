@@ -7,7 +7,8 @@ NULL
 #' Calculate Kendall distance matrix between rankings
 #' 
 #' @param ranking a matrix of rankings
-#' @return  Kendall distance matrix between rankings
+#' @return  Kendall distance matrix between rankings. The value in ith row and jth column is the
+#' Kendall distance between the ith and jth rankings.
 #' @export
 DistanceMatrix <- function(ranking){
   n = ncol(ranking)
@@ -20,7 +21,7 @@ DistanceMatrix <- function(ranking){
 }
 
 #' Calculate Kendall distance
-#' #' Calculate Kendall distance matrix between one ranking and a matrix of rankings
+#' Calculate Kendall distance matrix between one ranking and a matrix of rankings
 #' @param mat a matrix of rankings
 #' @param r a single ranking
 #' @return a vector of Kendall distance
@@ -33,7 +34,6 @@ DistanceBlock <- function(mat,r){
 }
 
 #' Calculate Kendall distance between a pair of rankings
-#' #' Calculate Kendall distance matrix between a pair of rankings
 #' @param r1 a single ranking
 #' @param r2 a single ranking
 #' @return Kendall distance value
@@ -70,16 +70,18 @@ ModelSummary <- function(model){
 #' Generate simple examples
 #' 
 #' This function generates simple examples for illustrative proposes.
-#' The sample contains the rankings of five objects and the underlying model is a Mallow's phi
-#' model with dispersion parameter set to 0.2
+#' The sample contains the rankings of five objects and the underlying model is a Mallows' phi
+#' model with default dispersion parameter set to 0.2
 #' and modal ranking set to (1,2,3,4,5)
 #' @param ranking TRUE if "ranking" representation is used in the output data; otherwise "ordering" representation is used.
+#' @param central The modal ranking.
+#' @param lambda The parameter in the model.
 #' @export
-GenerateExample <- function(ranking=TRUE){
+GenerateExample <- function(ranking=TRUE, central=1:5, lambda=0.2){
   rankings <- rbind(1:5,permute::allPerms(5))
-  central <- 1:5
+  # central <- 1:5
   Kdist <- DistanceBlock(rankings,central)
-  lambda <- 0.2
+  # lambda <- 0.2
   prob <- exp(-lambda*Kdist)
   prob <- prob/sum(prob)
   indx <- sample(1:120, 2000,replace=TRUE,prob=prob)
@@ -91,19 +93,19 @@ GenerateExample <- function(ranking=TRUE){
   }
 }
 
-#' Generate simple examples of top-q
+#' Generate simple examples of top-q rankings
 #' 
 #' This function generates simple examples for illustrative proposes.
 #' The sample contains the top-3 rankings of five objects and the underlying model is a weighted Kendall distance model
-#' model with weights set to (0.7,0.5,0.3,0)
-#' and modal ranking set to (1,2,3,4,5)
+#' model with default weights set to (0.7,0.5,0.3,0)
+#' and modal ranking set to (1,2,3,4,4)
+#' @param central The modal ranking.
+#' @param w The weights in the model.
 #' @export
-GenerateExampleTopQ <- function(){
+GenerateExampleTopQ <- function(central=c(1,2,3,4,4),w=c(0.7,0.5,0.3,0)){
   prankings <- rbind(1:5,permute::allPerms(5))
   prankings[prankings>3] <- 4
   prankings <- prankings[!duplicated(prankings),]
-  central <- prankings[1,]
-  w <- c(0.7,0.5,0.3,0)
   fai <- wToparam(w)
   distmat <- matrix(CWeightGivenPi(prankings,central),ncol=nrow(prankings),byrow=TRUE)
   distvec <- as.numeric(fai%*%distmat)
@@ -116,7 +118,8 @@ GenerateExampleTopQ <- function(){
 
 #' Create Hash Value for Rank 
 #'
-#' Sometimes it is handier to deal with rankings into a hash value. \code{RanktoHash} returns hash values for ranks. Maximum 52 objects are supported.
+#' Sometimes it is handy to deal with rankings as a hash value. \code{RanktoHash} returns hash values for ranks. 
+#' Maximum 52 objects are supported.
 #' @param r  a vector or matrix of rankings. Each row of the matrix represents a ranking.
 #'   The ranking should be a integer from one to number of objects. No NA is allowed
 #' @return a vector of character strings representing the hash values.
@@ -137,7 +140,7 @@ RanktoHash <- function(r){
 #'
 #' \code{HashToRank} returns rankings from given hash values. Maximum 52 objects are supported.
 #' @param h  A vector of hash values. 
-#' @return a matrix of rankings if input has more than one element or a vector of rankings if input has only one element
+#' @return a matrix of rankings if input has more than one element or a single ranking (numeric vector) if input has only one element
 #' @seealso \code{\link{RanktoHash}} for a reverse operation.
 #' @export
 HashtoRank <- function(h){
@@ -177,7 +180,7 @@ OrderingToRanking <- function(ordering){
 
 #' Fit A Mixture of Distance-based Models
 #' 
-#' \code{RankDistModel} fits a mixture of ranking models based on weighted Kendall distance.
+#' \code{RankDistanceModel} fits a mixture of ranking models
 #' 
 #' The procedure will estimate central rankings, the probability of each cluster and weights.
 #' 
@@ -187,8 +190,8 @@ OrderingToRanking <- function(ordering){
 #' 
 #' @return A list containing the following components:
 #' \describe{
-#' \item{\code{modal_ranking.est}}{the estimated pi0 for each cluster.}
-#' \item{\code{p}}{the probability of each cluster.}
+#' \item{\code{modal_ranking.est}}{the estimated modal ranking for each cluster.}
+#' \item{\code{p}}{the marginal probability of each cluster.}
 #' \item{\code{w.est}}{the estimated weights of each cluster.}
 #' \item{\code{param.est}}{the param parametrisation of weights of each cluster.}
 #' \item{\code{SSR}}{the sum of squares of Pearson residuals}
@@ -201,6 +204,11 @@ OrderingToRanking <- function(ordering){
 #' }
 #' @export
 RankDistanceModel <- function(dat,init,ctrl){
+    flag_transform = (min(dat@topq) != dat@nobj - 1)#  && class(ctrl) %in% c("RankControlKendall", "RankControlPhiComponent", "RankControlWtau")
+    if (flag_transform){
+        dat_org = dat
+        dat = BreakTieEqualProb(dat)
+    }
     # get parameters
     tt <- dat@nobj # number of objects
     n <- dat@nobs    # total observations
@@ -246,14 +254,14 @@ RankDistanceModel <- function(dat,init,ctrl){
             }
             for ( i in 1:clu){
                 dat.clu <- UpdateCount(dat, z[,i] * count)
-                # need change 
                 init.clu[[i]]@param.init <- list(param[[i]])
                 init.clu[[i]]@modal_ranking.init <- list(modal_ranking.est[[i]])
-                
                 solve.clu <- SearchPi0(dat.clu,init.clu[[i]],ctrl)
                 modal_ranking.est[[i]] <- solve.clu$pi0.ranking
                 param[[i]] <- solve.clu$param.est
-                p_clu[i,] <- FindProb(dat,ctrl,modal_ranking.est[[i]],param[[i]])*p[i]
+                # change here: conditional prob for each cluster
+                # p_clu[i,] <- FindProb(dat,ctrl,modal_ranking.est[[i]],param[[i]])*p[i]
+                p_clu[i,] <- FindProb(dat.clu,ctrl,modal_ranking.est[[i]],param[[i]])*p[i]
             }
             log_likelihood_clu <- sum(log(colSums(p_clu))%*%dat@count)
             # break?
@@ -290,10 +298,45 @@ RankDistanceModel <- function(dat,init,ctrl){
     # finishing up with parameter estimation and summary statistics
     p <- as.numeric(p)
     v <- length(p) - 1 + sum(unlist(param)!=0)
-    bic <- 2*log_likelihood_clu.last - v*log(n)
-    expectation <- as.numeric(est_prob*n)
-    SSR <- sum((expectation-dat@count)^2/expectation)
-    ret <- list(p=p,modal_ranking.est=modal_ranking.est,w.est=lapply(param,paramTow),param.est=param,SSR=SSR,log_likelihood=log_likelihood_clu.last,free_params=v,BIC=bic,expectation=expectation,iteration=loopind,model.call=func.call)
+    if (flag_transform){
+        full_prob = rep(0, length(dat_org@count))
+        # aggregate probability
+        # iterate through different q
+        for (i in 1:length(dat_org@topq)){
+            ind_start <- dat_org@q_ind[i]
+            ind_end <- dat_org@q_ind[i+1] - 1
+            this_q <- dat_org@topq[i]
+            ranking_q <- dat@ranking
+            ranking_q[ranking_q > this_q] <- this_q + 1
+            hash_q = RanktoHash(ranking_q)
+            # iterate through partial rankings
+            for (ind_partial in ind_start:ind_end){
+                this_partial <- dat_org@ranking[ind_partial, ]
+                this_hash <- RanktoHash(this_partial)
+                ind_agg<- which(hash_q == this_hash)
+                prob_agg<- sum(est_prob[ind_agg])
+                full_prob[ind_partial] <- prob_agg
+            }
+            # conditional
+            p_q = dat_org@subobs[i] / dat_org@nobs
+            full_prob[ind_start:ind_end] = full_prob[ind_start:ind_end]*p_q
+        }
+        log_like<- dat_org@count %*% log(full_prob)
+        bic <- -2*log_like + v*log(n)
+        expectation <- as.numeric(full_prob*n)
+        SSR <- sum((expectation-dat_org@count)^2/expectation)
+    } else {
+        
+        log_like<- dat@count %*% as.numeric(log(est_prob))
+        log_likelihood_clu.last - log_like
+        
+        bic <- -2*log_like + v*log(n)
+        expectation <- as.numeric(est_prob*n)
+        SSR <- sum((expectation-dat@count)^2/expectation)
+    }
+    ret <- list(p=p,modal_ranking.est=modal_ranking.est,w.est=lapply(param,paramTow),
+                param.est=param,SSR=SSR,log_likelihood=log_likelihood_clu.last,free_params=v,
+                BIC=bic,expectation=expectation,iteration=loopind,model.call=func.call)
     ret
 }
 

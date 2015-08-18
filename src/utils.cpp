@@ -1,5 +1,6 @@
 #include <Rcpp.h>
 #include <math.h>
+#include <algorithm>
 using namespace Rcpp;
 
 // [[Rcpp::export]]
@@ -188,17 +189,87 @@ double LogC_Component(NumericVector fai){
     return (acc_log);
 }
 
+// [[Rcpp::export]]
+int cycle_decomp(NumericVector comp){
+    int nobj = comp.size();
+    int num_cycles=0, num_visited=0, item= 0;
+    bool*visited = new bool[ nobj ];
+    for (int i = 0 ; i < nobj; i ++ )visited[ i ] =false;
+    while(num_visited < nobj ){
+        item = num_cycles;
+        while ( visited[ item ]) item++;
+        num_cycles++;
+        int max_item_inobjcycle= 0;
+        do{
+            if ( item > max_item_inobjcycle ) max_item_inobjcycle = item;
+            visited[ item ] =true;
+            num_visited++;
+            item = comp(item)-1;
+        }while ( !visited[ item ] );
+    }
+    delete [] visited;
+    return (nobj - num_cycles );
+}
+
+// [[Rcpp::export]]
+NumericVector FindCayley(NumericMatrix obs, NumericVector pi0){
+    int nrow = obs.nrow();
+    int nobj = obs.ncol();
+    NumericVector ret(nrow);
+    NumericVector sigma_inv(nobj), comp(nobj);
+    for (int this_obs=0; this_obs<nrow; ++this_obs){
+        for(int j = 0 ; j < nobj ; j++) sigma_inv(pi0(j) - 1) = j + 1;
+        for(int i = 0 ; i < nobj ; i++) comp(i) = obs(this_obs, sigma_inv(i) - 1);
+        ret(this_obs) = cycle_decomp(comp);
+    }
+    return ret;
+}
+
+// [[Rcpp::export]]
+NumericMatrix Wtau(NumericMatrix obs, NumericVector pi0){
+    int param_len = obs.ncol()*(obs.ncol()-1)/2;
+    int nobj = obs.ncol();
+    NumericMatrix ret(obs.nrow(), param_len);
+    int filling_pos = 0;
+    // each observation
+    for (int ind_obs=0; ind_obs<obs.nrow(); ++ind_obs){
+        filling_pos = 0;
+        // columns
+        for (int i=1; i<nobj; ++i){
+            // rows
+            for (int j=0; j<i; ++j){
+                double equal_sign = (pi0(j) - pi0(i)) * (obs(ind_obs,j) - obs(ind_obs,i));
+                ret(ind_obs, filling_pos) = (equal_sign < 0) ? 1:0;
+                ++filling_pos;
+            }
+        }
+    }
+    
+    return (ret);
+}
 
 
 
-
-
-
-
-
-
-
-
+//[[Rcpp::export]]
+NumericMatrix AllPerms(int nobj){
+    int fac_nobj = 1;
+    for(int b = 1; b <= nobj; b++) {
+        fac_nobj *= b;
+    }
+    NumericMatrix ret(fac_nobj ,nobj);
+    int *ranking = new int[nobj];
+    for (int i=0; i<nobj; ++i){
+        ranking[i] = i+1;
+    }
+    int current_row = 0;
+    do {
+        for (int i=0; i<nobj; ++i){
+            ret(current_row, i) = ranking[i];
+        }
+        ++current_row;
+    } while ( std::next_permutation(ranking,ranking+nobj) );
+    return(ret);
+}
 
 
 

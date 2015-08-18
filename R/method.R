@@ -70,6 +70,8 @@ setMethod("initialize", "RankData",
 setGeneric("SingleClusterModel",
         def=function(dat,init,ctrl,modal_ranking){standardGeneric("SingleClusterModel")}
 )
+# 
+
 
 # single cluster model method for Weighted Kendall Distance
 setMethod(
@@ -103,10 +105,11 @@ setMethod(
       log_likelihood = -1 * opt_res[[param_len + 1]]
     } else {
       obj = function(param) {
+        cond_prob = dat@subobs/dat@nobs
         norm_vec = numeric(length(dat@topq))
         for (i in 1:length(dat@topq)) {
           j = dat@topq[i]
-          norm_vec[i] = LogC(c(param[1:j],rep(0,dat@nobj-1 - j)))
+          norm_vec[i] = LogC(c(param[1:j],rep(0,dat@nobj-1 - j))) - lgamma(dat@nobj-j+1) - log(cond_prob[i])
         }
         a = -1 * param %*% param.coeff - dat@subobs %*% norm_vec
         as.numeric(-1 * a)
@@ -116,7 +119,7 @@ setMethod(
           rep(Inf,param_len),method = "L-BFGS-B",control = ctrl@optimx_control
       )
       param.est = unlist(opt_res[1:param_len])
-      log_likelihood = -1 * opt_res[[param_len + 1]]
+      log_likelihood = -1 * obj(param.est)
     }
     param.est = c(param.est,rep(0,dat@nobj - 1 - param_len))
     list(
@@ -124,41 +127,6 @@ setMethod(
     )
   }
 )
-
-# remove this and uncomment above function
-# setMethod("SingleClusterModel",
-    # signature = c("RankData","RankInit","RankControlWeightedKendall"),
-    # definition = function(dat,init,ctrl,modal_ranking){
-        # param.coeff = CWeightGivenPi(dat@ranking,modal_ranking)
-        # param.coeff = matrix(param.coeff,ncol = dat@ndistinct,byrow = TRUE)%*%dat@count
-        # param.coeff = as.numeric(param.coeff)
-        # param_len = dat@nobj-1
-        # if (dat@topq>0){
-            # param.coeff = param.coeff[1:dat@topq]
-            # param_len = dat@topq
-        # }
-		# ind = c(1,6,26,86,206)
-		# count_vec = numeric(4)
-		# for (i in 1:4){
-			# count_vec[i] = sum(dat@count[ind[i]:(ind[i+1]-1)])
-		# }
-        # obj = function(param){
-			# norm_vec = numeric(param_len)
-			# for (i in 1:param_len){
-				# norm_vec[i] = LogC(c(param[1:i],rep(0,param_len-i)))
-			# }
-            # a = -1*param%*%param.coeff - count_vec%*%norm_vec
-            # as.numeric(-1*a)
-        # }
-
-		# opt_res = optimx::optimx(par=init@param.init[[init@clu]][1:param_len],fn=obj,lower=rep(0,param_len),upper=rep(Inf,param_len),method="L-BFGS-B",control=ctrl@optimx_control)
-		# param.est = unlist(opt_res[1:param_len])
-		# log_likelihood=-1*opt_res[[param_len+1]]
-
-		# param.est = c(param.est,rep(0,dat@nobj-1-param_len))
-        # list(param.est=param.est,w.est=paramTow(param.est),log_likelihood=log_likelihood)
-    # }
-# )
 
 # single cluster model method for Kendall distance
 setMethod("SingleClusterModel",
@@ -172,9 +140,9 @@ setMethod("SingleClusterModel",
             param*param.coeff + dat@nobs*LogC_Component(rep(param,dat@nobj-1))
         }
         
-        opt_res = stats::optimize(f=obj,interval =c(0,100))
+        opt_res <- stats::optimize(f=obj,interval =c(0,100))
         list(param.est=opt_res$minimum,log_likelihood=-1*opt_res$objective)
-        }
+    }
 )
 
 # single cluster model method for Phi Component Model
@@ -198,7 +166,111 @@ setMethod("SingleClusterModel",
         param.est <- vapply(opt_res,function(x)x$root,numeric(1))
         log_likelihood <- -param.coeff%*%param.est - dat@nobs*LogC_Component(param.est)
         list(param.est=param.est,log_likelihood=log_likelihood)
-        }
+    }
+)
+
+setMethod("SingleClusterModel",
+          signature = c("RankData","RankInit","RankControlWtau"),
+          definition = function(dat, init, ctrl, modal_ranking){
+              # the same order as param.expand
+              param_len <- dat@nobj
+              param.coeff <- Wtau(dat@ranking, modal_ranking)
+              param.coeff <- t(param.coeff)%*%dat@count
+              param.coeff <- as.numeric(param.coeff)
+              allperm <- AllPerms(dat@nobj)
+              all_coeff <- Wtau(allperm, modal_ranking)
+              obj <- function(param){
+                  param.expand <- outer(param,param)[upper.tri(diag(length(param)))]
+                  LogC <- log(sum(exp(-1*all_coeff %*% param.expand)))
+                  loglike <- param.coeff %*% param.expand + dat@nobs*LogC
+                  as.numeric(loglike)
+              }
+              opt_res = optimx::optimx(
+                  par = init@param.init[[init@clu]][1:param_len],fn = obj,
+                    method = "Nelder-Mead",control = ctrl@optimx_control
+              )
+              param.est = unlist(opt_res[1:param_len])
+              log_likelihood = -1 * opt_res[[param_len + 1]]
+              list(
+                  param.est = param.est,log_likelihood = log_likelihood
+              )
+          }
+)
+
+# single cluster model method for Kendall distance
+setMethod("SingleClusterModel",
+          signature = c("RankData","RankInit","RankControlSpearman"),
+          definition = function(dat,init,ctrl,modal_ranking){
+              param.coeff <- colSums((t(dat@ranking) - modal_ranking)^2)
+              param.coeff <- as.numeric(param.coeff)%*%dat@count
+              param.coeff <- 0.5*as.numeric(param.coeff)
+              allperm <- AllPerms(dat@nobj)
+              all_coeff <- 0.5*as.numeric(colSums((t(allperm) - modal_ranking)^2))
+              
+              obj <- function(param){
+                  LogC <- log(sum(exp(-1 * all_coeff * param)))
+                  param*param.coeff + dat@nobs*LogC
+              }
+              
+              opt_res <- stats::optimize(f=obj,interval =c(0,100))
+              list(param.est=opt_res$minimum,log_likelihood=-1*opt_res$objective)
+          }
+)
+
+setMethod("SingleClusterModel",
+          signature = c("RankData","RankInit","RankControlFootrule"),
+          definition = function(dat,init,ctrl,modal_ranking){
+              param.coeff <- apply(dat@ranking, 1, function(x){ sum(abs(x-modal_ranking))} )
+              param.coeff <- as.numeric(param.coeff)%*%dat@count
+              param.coeff <- as.numeric(param.coeff)
+              allperm <- AllPerms(dat@nobj)
+              all_coeff <- as.numeric(apply(allperm, 1, function(x){ sum(abs(x-modal_ranking))} ))
+              
+              obj <- function(param){
+                  LogC <- log(sum(exp(-1 * all_coeff * param)))
+                  param*param.coeff + dat@nobs*LogC
+              }
+              
+              opt_res <- stats::optimize(f=obj,interval =c(0,100))
+              list(param.est=opt_res$minimum,log_likelihood=-1*opt_res$objective)
+          }
+)
+
+setMethod("SingleClusterModel",
+          signature = c("RankData","RankInit","RankControlHamming"),
+          definition = function(dat,init,ctrl,modal_ranking){
+              param.coeff <- apply(dat@ranking, 1, function(x){sum(x != modal_ranking)} )
+              param.coeff <- as.numeric(param.coeff)%*%dat@count
+              param.coeff <- as.numeric(param.coeff)
+              allperm <- AllPerms(dat@nobj)
+              all_coeff <- as.numeric(apply(allperm, 1, function(x){sum(x != modal_ranking)} ))
+              
+              obj <- function(param){
+                  LogC <- log(sum(exp(-1 * all_coeff * param)))
+                  param*param.coeff + dat@nobs*LogC
+              }
+              
+              opt_res <- stats::optimize(f=obj,interval =c(0,100))
+              list(param.est=opt_res$minimum,log_likelihood=-1*opt_res$objective)
+          }
+)
+
+setMethod("SingleClusterModel",
+          signature = c("RankData","RankInit","RankControlCayley"),
+          definition = function(dat,init,ctrl,modal_ranking){
+              param.coeff <- FindCayley(dat@ranking, modal_ranking)%*%dat@count
+              param.coeff <- as.numeric(param.coeff)
+              allperm <- AllPerms(dat@nobj)
+              all_coeff <- as.numeric(FindCayley(allperm, modal_ranking))
+              
+              obj <- function(param){
+                  LogC <- log(sum(exp(-1 * all_coeff * param)))
+                  param*param.coeff + dat@nobs*LogC
+              }
+              
+              opt_res <- stats::optimize(f=obj,interval =c(0,100))
+              list(param.est=opt_res$minimum,log_likelihood=-1*opt_res$objective)
+          }
 )
 
 setGeneric("FindProb",
@@ -230,21 +302,6 @@ setMethod("FindProb",
         }
 )
 
-# tmp version
-# TODO: delete this and uncomment the function above
-# setMethod("FindProb",
-#         signature=c("RankData","RankControlWeightedKendall"),
-#         definition = function(dat,ctrl,modal_ranking,param){
-#             distance = param %*% matrix(CWeightGivenPi(dat@ranking,modal_ranking),ncol = dat@ndistinct,byrow = TRUE)
-#             prob = exp(-1*distance)
-# 			ind = c(1,6,26,86,206)
-# 			cond_prob = c(0.3327723,0.1593631,0.1364490,0.3714156)
-# 			for (i in 1:4){
-# 				prob[ind[i]:(ind[i+1]-1)] = prob[ind[i]:(ind[i+1]-1)]/sum(prob[ind[i]:(ind[i+1]-1)])*cond_prob[i]
-# 			}
-#             prob
-#         }
-# )
 setMethod("FindProb",
         signature=c("RankData","RankControlKendall"),
         definition = function(dat,ctrl,modal_ranking,param){
@@ -267,19 +324,72 @@ setMethod("FindProb",
         }
 )
 
+setMethod("FindProb",
+          signature=c("RankData","RankControlWtau"),
+          definition<- function(dat,ctrl,modal_ranking,param){
+              allperm <- AllPerms(dat@nobj)
+              all_coeff <- Wtau(allperm, modal_ranking)
+              param.expand <- outer(param,param)[upper.tri(diag(length(param)))]
+              C <- sum(exp(-1*all_coeff %*% param.expand))
+              distance<- Wtau(dat@ranking, modal_ranking) %*% param.expand
+              prob<- exp(-1*distance)/C
+              prob
+          }
+)
+
+setMethod("FindProb",
+          signature=c("RankData","RankControlSpearman"),
+          definition<- function(dat,ctrl,modal_ranking,param){
+              allperm <- AllPerms(dat@nobj)
+              all_coeff <- 0.5*as.numeric(colSums((t(allperm) - modal_ranking)^2))
+              C <- sum(exp(-1*all_coeff * param))
+              param.coeff <- colSums((t(dat@ranking) - modal_ranking)^2)
+              param.coeff <- 0.5*as.numeric(param.coeff)
+              distance <- param.coeff * param
+              prob <- exp(-1*distance)/C
+              prob
+          }
+)
 
 
+setMethod("FindProb",
+          signature=c("RankData","RankControlFootrule"),
+          definition<- function(dat,ctrl,modal_ranking,param){
+              allperm <- AllPerms(dat@nobj)
+              all_coeff <- as.numeric(apply(allperm, 1, function(x){ sum(abs(x-modal_ranking))} ))
+              C <- sum(exp(-1*all_coeff * param))
+              param.coeff <- apply(dat@ranking, 1, function(x){ sum(abs(x-modal_ranking))} )
+              param.coeff <- as.numeric(param.coeff)
+              distance <- param.coeff * param
+              prob <- exp(-1*distance)/C
+              prob
+          }
+)
 
 
+setMethod("FindProb",
+          signature=c("RankData","RankControlHamming"),
+          definition<- function(dat,ctrl,modal_ranking,param){
+              allperm <- AllPerms(dat@nobj)
+              all_coeff <- as.numeric(apply(allperm, 1, function(x){sum(x != modal_ranking)} ))
+              C <- sum(exp(-1*all_coeff * param))
+              param.coeff <- apply(dat@ranking, 1, function(x){sum(x != modal_ranking)} )
+              param.coeff <- as.numeric(param.coeff)
+              distance <- param.coeff * param
+              prob <- exp(-1*distance)/C
+              prob
+          }
+)
 
-
-
-
-
-
-
-
-
-
-
-
+setMethod("FindProb",
+          signature=c("RankData","RankControlCayley"),
+          definition<- function(dat,ctrl,modal_ranking,param){
+              allperm <- AllPerms(dat@nobj)
+              all_coeff <- as.numeric(FindCayley(allperm, modal_ranking))
+              C <- sum(exp(-1*all_coeff * param))
+              param.coeff <- FindCayley(dat@ranking, modal_ranking)
+              distance <- param.coeff * param
+              prob <- exp(-1*distance)/C
+              prob
+          }
+)

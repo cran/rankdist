@@ -2,11 +2,11 @@
 #' @title RankData Class
 #' @description A S4 class to represent ranking data
 #' 
-#' It is well understood that the ranking representation and ordering representation of ranking data can easily get confused.
-#' I thus use a S4 class to store all the information about the ranking data. This can avoid unnecessary confusions.
+#' It is well understood that the ranking representation and ordering representation of ranking data can easily be confused.
+#' I thus use a S4 class to store all the information about the ranking data. This can avoid unnecessary confusion.
 #' 
-#' @slot nobj an number to store number of ranked objects. If not provided, it will be inferred as the maximum ranking in the data set. As a result, it must be provided if the data is top-q ranking.
-#' @slot nobs the number of observations. No need to be provided during initialization since it must be equal to sum of slot \code{count}.
+#' @slot nobj The number of ranked objects. If not provided, it will be inferred as the maximum ranking in the data set. As a result, it must be provided if the data is top-q ranking.
+#' @slot nobs the number of observations. No need to be provided during initialization since it must be equal to the sum of slot \code{count}.
 #' @slot ndistinct the number of distinct rankings. No need to be provided during initialization since it must be equal to the number of rows of slot \code{ranking}.
 #' @slot ranking a matrix that stores the ranking representation of distinct rankings. Each row contains one ranking. For top-q ranking, all unobserved objects have ranking \code{q+1}.
 #' @slot count the number of observations for each distinct ranking corresponding to each row of \code{ranking}.
@@ -201,14 +201,54 @@ setClass( "RankControlPhiComponent",
         contains = "RankControl"
 )
 
+#' @title RankControlWdbm Class
+#' @description A S4 class for the Weighted tau model fitting.
+#' It is derived from class \code{\link{RankControl-class}}. 
+#' 
+#' @aliases RankControlWdbm RankControlWdbm-class
+#' @export
+setClass( "RankControlWtau",
+          contains = "RankControl"
+)
 
+#' @title RankControlSpearman Class
+#' @description A S4 class for the Spearman distance model fitting.
+#' It is derived from class \code{\link{RankControl-class}}. 
+#' 
+#' @aliases RankControlSpearman RankControlSpearman-class
+#' @export
+setClass("RankControlSpearman",
+         contains = "RankControl"
+)
 
+#' @title RankControlFootrule Class
+#' @description A S4 class for the Footrule distance model fitting.
+#' It is derived from class \code{\link{RankControl-class}}. 
+#' 
+#' @aliases RankControlFootrule RankControlFootrule-class
+#' @export
+setClass("RankControlFootrule",
+         contains = "RankControl"
+)
 
+#' @title RankControlHamming Class
+#' @description A S4 class for the Hamming distance model fitting.
+#' It is derived from class \code{\link{RankControl-class}}. 
+#' 
+#' @aliases RankControlHamming RankControlHamming-class
+#' @export
+setClass("RankControlHamming",
+         contains = "RankControl"
+)
 
-
-
-
-
-
+#' @title RankControlCayley Class
+#' @description A S4 class for the Cayley distance model fitting.
+#' It is derived from class \code{\link{RankControl-class}}. 
+#' 
+#' @aliases RankControlCayley RankControlCayley-class
+#' @export
+setClass("RankControlCayley",
+         contains = "RankControl"
+)
 
 
