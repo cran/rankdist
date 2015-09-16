@@ -28,8 +28,6 @@ RankControl class must be extended to reflect what distance metric should be use
 
 \item{\code{SearchPi0_neighbour}}{a character string specifying which type of neighbour to use in the local search. Supported values are: "Cayley" to use neighbours in terms of Cayley distance or "Kendall" to use neighbours in terms of Kendall distance.
 Note that Kendall neighbours are a subset of Cayley neighbours}
-
-\item{\code{optimx_control}}{a list to be passed to \code{\link[optimx]{optimx}}. The list must not contain a component \code{maximize=TRUE} since internally the negation of the likelihood function is minimized.}
 }}
 \section{User-defined Criterion}{
 

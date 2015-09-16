@@ -9,4 +9,7 @@
 A S4 class for the Cayley distance model fitting.
 It is derived from class \code{\link{RankControl-class}}.
 }
+\seealso{
+\code{\link{RankData}}, \code{\link{RankInit}}, \code{\link{RankControl}}
+}
 

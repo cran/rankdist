@@ -165,7 +165,7 @@ NumericMatrix FindV(NumericMatrix obs, NumericVector pi0){
     for (int i=0;i<obs.nrow();++i){
         pi0_dummy=seq_len(pi0.size());
         for (int j=0;j<ret.ncol();++j){
-            ret(i,j) = abs(obs(i,pi0_perm(j))-pi0_dummy(j));
+            ret(i,j) = std::fabs(obs(i,pi0_perm(j))-pi0_dummy(j));
             for (int k=j; k<ret.ncol();++k){
                 if (obs(i,pi0_perm(k)) < obs(i,pi0_perm(j))){
                     --pi0_dummy(k);

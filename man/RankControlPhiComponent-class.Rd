@@ -31,8 +31,6 @@ The control parameters that start with prefix \code{EM_} are intended for the EM
 
 \item{\code{SearchPi0_neighbour}}{a character string specifying which type of neighbour to use in the local search. Supported values are: "Cayley" to use neighbours in terms of Cayley distance or "Kendall" to use neighbours in terms of Kendall distance.
 Note that Kendall neighbours are a subset of Cayley neighbours}
-
-\item{\code{optimx_control}}{this slot is not used.}
 }}
 \examples{
 # enabling messages

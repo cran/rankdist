@@ -32,6 +32,8 @@ The control parameters that start with prefix \code{EM_} are intended for the EM
 Note that Kendall neighbours are a subset of Cayley neighbours}
 
 \item{\code{optimx_control}}{a list to be passed to \code{\link[optimx]{optimx}}. The list must not contain a component \code{maximize=TRUE} since internally the negation of the likelihood function is minimized.}
+
+\item{\code{assumption}}{A character string specifying which assumption to use when handling top-q rankings. Supported choices are "equal-probability" and "tied-rank".}
 }}
 \examples{
 # enabling  warnings

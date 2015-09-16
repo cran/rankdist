@@ -204,7 +204,10 @@ OrderingToRanking <- function(ordering){
 #' }
 #' @export
 RankDistanceModel <- function(dat,init,ctrl){
-    flag_transform = (min(dat@topq) != dat@nobj - 1)#  && class(ctrl) %in% c("RankControlKendall", "RankControlPhiComponent", "RankControlWtau")
+    flag_transform = (min(dat@topq) != dat@nobj - 1)
+    if (class(ctrl) == "RankControlWeightedKendall"){
+        flag_transform = (ctrl@assumption == "equal-probability")
+    }
     if (flag_transform){
         dat_org = dat
         dat = BreakTieEqualProb(dat)

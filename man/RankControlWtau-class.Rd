@@ -10,4 +10,12 @@
 A S4 class for the Weighted tau model fitting.
 It is derived from class \code{\link{RankControl-class}}.
 }
+\section{Slots}{
+
+\describe{
+\item{\code{optimx_control}}{a list to be passed to \code{\link[optimx]{optimx}}. The list must not contain a component \code{maximize=TRUE} since internally the negation of the likelihood function is minimized.}
+}}
+\seealso{
+\code{\link{RankData}}, \code{\link{RankInit}}, \code{\link{RankControl}}
+}
 

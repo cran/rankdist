@@ -93,7 +93,6 @@ setClass( "RankInit",
 #' @slot SearchPi0_show_message a logical value. If TRUE, the location of the current pi0 is shown.
 #' @slot SearchPi0_neighbour a character string specifying which type of neighbour to use in the local search. Supported values are: "Cayley" to use neighbours in terms of Cayley distance or "Kendall" to use neighbours in terms of Kendall distance.
 #' Note that Kendall neighbours are a subset of Cayley neighbours
-#' @slot optimx_control a list to be passed to \code{\link[optimx]{optimx}}. The list must not contain a component \code{maximize=TRUE} since internally the negation of the likelihood function is minimized.
 #' @details RankControl class must be extended to reflect what distance metric should be used. Possibles extensions are \code{\link{RankControlWeightedKendall}}. The control parameters that start with prefix \code{EM_} are intended for the EM iteration. The ones with prefix \code{SeachPi0} control the behaviour of searching model ranking.
 #' @section User-defined Criterion:
 #' You can specify user-defined criterion to choose modal rankings. The function object SearchPi0_FUN takes a list as argument. The components in the list include the following. \code{obs}: the number of observations.
@@ -111,7 +110,7 @@ setClass( "RankControl",
               SearchPi0_fast_traversal = "logical",
               SearchPi0_show_message = "logical",
               SearchPi0_neighbour = "character",
-              optimx_control = "list",
+              # optimx_control = "list",
               "VIRTUAL"
           ),
           prototype = prototype(
@@ -121,8 +120,8 @@ setClass( "RankControl",
               SearchPi0_FUN = function(x){x$log_likelihood},
               SearchPi0_fast_traversal=TRUE,
               SearchPi0_show_message=FALSE,
-              SearchPi0_neighbour="Cayley",
-              optimx_control = list(maximize=FALSE,starttests=TRUE,trace=0,dowarn=FALSE)
+              SearchPi0_neighbour="Cayley"
+              # optimx_control = list(maximize=FALSE,starttests=TRUE,trace=0,dowarn=FALSE)
           )
 )
 
@@ -139,6 +138,7 @@ setClass( "RankControl",
 #' @slot SearchPi0_neighbour a character string specifying which type of neighbour to use in the local search. Supported values are: "Cayley" to use neighbours in terms of Cayley distance or "Kendall" to use neighbours in terms of Kendall distance.
 #' Note that Kendall neighbours are a subset of Cayley neighbours
 #' @slot optimx_control a list to be passed to \code{\link[optimx]{optimx}}. The list must not contain a component \code{maximize=TRUE} since internally the negation of the likelihood function is minimized.
+#' @slot assumption A character string specifying which assumption to use when handling top-q rankings. Supported choices are "equal-probability" and "tied-rank".
 #' @details \code{RankControlWeightedKendall} is derived from virtual class \code{\link{RankControl}}. All slots in \code{\link{RankControl}} are still valid.
 #' This control class tells the solver to fit a model based on Weighted Kendall distance.  
 #' The control parameters that start with prefix \code{EM_} are intended for the EM iteration. The ones with prefix \code{SeachPi0} control the behaviour of searching model ranking.
@@ -148,7 +148,15 @@ setClass( "RankControl",
 #' @aliases RankControlWeightedKendall RankControlWeightedKendall-class
 #' @export
 setClass( "RankControlWeightedKendall",
-        contains = "RankControl"
+        contains = "RankControl",
+        representation = representation(
+            optimx_control = "list",
+            assumption = "character"
+        ),
+        prototype = prototype(
+            optimx_control = list(maximize=FALSE,starttests=TRUE,trace=0,dowarn=FALSE),
+            assumption = "tied-rank" # equal-probability
+        )
 )
 
 #' @title RankControlKendall Class
@@ -163,7 +171,6 @@ setClass( "RankControlWeightedKendall",
 #' @slot SearchPi0_show_message a logical value. If TRUE, the location of the current pi0 is shown.
 #' @slot SearchPi0_neighbour a character string specifying which type of neighbour to use in the local search. Supported values are: "Cayley" to use neighbours in terms of Cayley distance or "Kendall" to use neighbours in terms of Kendall distance.
 #' Note that Kendall neighbours are a subset of Cayley neighbours
-#' @slot optimx_control this slot is not used.
 #' @details \code{RankControlKendall} is derived from virtual class \code{\link{RankControl}}.
 #' This control class tells the solver to fit a model based on Kendall distance.  
 #' The control parameters that start with prefix \code{EM_} are intended for the EM iteration. The ones with prefix \code{SeachPi0} control the behaviour of searching model ranking.
@@ -188,7 +195,6 @@ setClass( "RankControlKendall",
 #' @slot SearchPi0_show_message a logical value. If TRUE, the location of the current pi0 is shown.
 #' @slot SearchPi0_neighbour a character string specifying which type of neighbour to use in the local search. Supported values are: "Cayley" to use neighbours in terms of Cayley distance or "Kendall" to use neighbours in terms of Kendall distance.
 #' Note that Kendall neighbours are a subset of Cayley neighbours
-#' @slot optimx_control this slot is not used.
 #' @details \code{RankControlKendall} is derived from virtual class \code{\link{RankControl}}.
 #' This control class tells the solver to fit a model based on a stage-wise generalization of Kendall distance.  
 #' The control parameters that start with prefix \code{EM_} are intended for the EM iteration. The ones with prefix \code{SeachPi0} control the behaviour of searching model ranking.
@@ -204,17 +210,24 @@ setClass( "RankControlPhiComponent",
 #' @title RankControlWdbm Class
 #' @description A S4 class for the Weighted tau model fitting.
 #' It is derived from class \code{\link{RankControl-class}}. 
-#' 
+#' @slot optimx_control a list to be passed to \code{\link[optimx]{optimx}}. The list must not contain a component \code{maximize=TRUE} since internally the negation of the likelihood function is minimized.
+#' @seealso \code{\link{RankData}}, \code{\link{RankInit}}, \code{\link{RankControl}}
 #' @aliases RankControlWdbm RankControlWdbm-class
 #' @export
 setClass( "RankControlWtau",
-          contains = "RankControl"
+          contains = "RankControl",
+          representation = representation(
+              optimx_control = "list"
+          ),
+          prototype = prototype(
+              optimx_control = list(maximize=FALSE,starttests=TRUE,trace=0,dowarn=FALSE)
+          )
 )
 
 #' @title RankControlSpearman Class
 #' @description A S4 class for the Spearman distance model fitting.
 #' It is derived from class \code{\link{RankControl-class}}. 
-#' 
+#' @seealso \code{\link{RankData}}, \code{\link{RankInit}}, \code{\link{RankControl}}
 #' @aliases RankControlSpearman RankControlSpearman-class
 #' @export
 setClass("RankControlSpearman",
@@ -224,7 +237,7 @@ setClass("RankControlSpearman",
 #' @title RankControlFootrule Class
 #' @description A S4 class for the Footrule distance model fitting.
 #' It is derived from class \code{\link{RankControl-class}}. 
-#' 
+#' @seealso \code{\link{RankData}}, \code{\link{RankInit}}, \code{\link{RankControl}}
 #' @aliases RankControlFootrule RankControlFootrule-class
 #' @export
 setClass("RankControlFootrule",
@@ -234,7 +247,7 @@ setClass("RankControlFootrule",
 #' @title RankControlHamming Class
 #' @description A S4 class for the Hamming distance model fitting.
 #' It is derived from class \code{\link{RankControl-class}}. 
-#' 
+#' @seealso \code{\link{RankData}}, \code{\link{RankInit}}, \code{\link{RankControl}}
 #' @aliases RankControlHamming RankControlHamming-class
 #' @export
 setClass("RankControlHamming",
@@ -244,7 +257,7 @@ setClass("RankControlHamming",
 #' @title RankControlCayley Class
 #' @description A S4 class for the Cayley distance model fitting.
 #' It is derived from class \code{\link{RankControl-class}}. 
-#' 
+#' @seealso \code{\link{RankData}}, \code{\link{RankInit}}, \code{\link{RankControl}}
 #' @aliases RankControlCayley RankControlCayley-class
 #' @export
 setClass("RankControlCayley",
