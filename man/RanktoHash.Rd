@@ -2,7 +2,7 @@
 % Please edit documentation in R/rankdist.R
 \name{RanktoHash}
 \alias{RanktoHash}
-\title{Create Hash Value for Rank}
+\title{Create Hash Value for Ranking}
 \usage{
 RanktoHash(r)
 }

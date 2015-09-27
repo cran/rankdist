@@ -19,7 +19,7 @@ A list containing the following components:
 \item{\code{modal_ranking.est}}{the estimated modal ranking for each cluster.}
 \item{\code{p}}{the marginal probability of each cluster.}
 \item{\code{w.est}}{the estimated weights of each cluster.}
-\item{\code{param.est}}{the param parametrisation of weights of each cluster.}
+\item{\code{param.est}}{the phi parametrisation of weights of each cluster (for Weighted Kendall model only).}
 \item{\code{SSR}}{the sum of squares of Pearson residuals}
 \item{\code{log_likelihood}}{the fitted log_likelihood}
 \item{\code{BIC}}{the fitted Bayesian Information Criterion value}
@@ -30,9 +30,12 @@ A list containing the following components:
 }
 }
 \description{
-\code{RankDistanceModel} fits a mixture of ranking models
+\code{RankDistanceModel} fits ranking models based on inputs
 }
 \details{
 The procedure will estimate central rankings, the probability of each cluster and weights.
+}
+\seealso{
+\code{\link{RankData}}, \code{\link{RankInit}}, \code{\link{RankControl}}
 }
 

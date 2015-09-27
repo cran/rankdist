@@ -14,5 +14,8 @@ A dataset containing 5738 complete votes and 9711 partial votes in APA election.
 \references{
 Marden, J. I. (1995). Analyzing and Modeling Rank Data (94-96). Chapman Hall, New York.
 }
+\seealso{
+\code{\link{apa_obj}}
+}
 \keyword{datasets}
 

@@ -20,11 +20,10 @@ DistanceMatrix <- function(ranking){
   apply(ranking,1,distcalc)
 }
 
-#' Calculate Kendall distance
-#' Calculate Kendall distance matrix between one ranking and a matrix of rankings
-#' @param mat a matrix of rankings
+#' Calculate Kendall distance between one ranking and a matrix of rankings
+#' @param mat a matrix of rankings. Each row stores a ranking.
 #' @param r a single ranking
-#' @return a vector of Kendall distance
+#' @return a vector of Kendall distances
 #' @export
 DistanceBlock <- function(mat,r){
   n = ncol(mat)
@@ -46,6 +45,7 @@ DistancePair <- function(r1,r2){
 }
 
 #' Print a brief summary of the fitted model
+#' 
 #' Print a brief summary of the fitted model. This includes information about goodness
 #' of fit as well as parameter estimation.
 #' @param model a ranking model returned by a call to RankDistanceModel function.
@@ -63,14 +63,14 @@ ModelSummary <- function(model){
   cat("Parameter Estimation\n")
   cat("Cluster",LETTERS[1:nobj],"p","Parameters\n",sep="\t")
   for (i in 1:length(clus)){
-    cat(i,model$modal_ranking.est[[clus[i]]],round(model$p[clus[i]],digits=2),round(model$w.est[[clus[i]]],digits=2),"\n",sep="\t")
+    cat(i,' ',' ',' ',model$modal_ranking.est[[clus[i]]],round(model$p[clus[i]],digits=2),round(model$w.est[[clus[i]]],digits=2),"\n",sep="\t")
   }
 }
 
 #' Generate simple examples
 #' 
 #' This function generates simple examples for illustrative proposes.
-#' The sample contains the rankings of five objects and the underlying model is a Mallows' phi
+#' The sample contains rankings of five objects and the underlying model is a Mallows' phi
 #' model with default dispersion parameter set to 0.2
 #' and modal ranking set to (1,2,3,4,5)
 #' @param ranking TRUE if "ranking" representation is used in the output data; otherwise "ordering" representation is used.
@@ -97,7 +97,7 @@ GenerateExample <- function(ranking=TRUE, central=1:5, lambda=0.2){
 #' 
 #' This function generates simple examples for illustrative proposes.
 #' The sample contains the top-3 rankings of five objects and the underlying model is a weighted Kendall distance model
-#' model with default weights set to (0.7,0.5,0.3,0)
+#' with default weights set to (0.7,0.5,0.3,0)
 #' and modal ranking set to (1,2,3,4,4)
 #' @param central The modal ranking.
 #' @param w The weights in the model.
@@ -116,7 +116,7 @@ GenerateExampleTopQ <- function(central=c(1,2,3,4,4),w=c(0.7,0.5,0.3,0)){
   return(list(ranking=prankings,count=count))
 }
 
-#' Create Hash Value for Rank 
+#' Create Hash Value for Ranking
 #'
 #' Sometimes it is handy to deal with rankings as a hash value. \code{RanktoHash} returns hash values for ranks. 
 #' Maximum 52 objects are supported.
@@ -164,6 +164,7 @@ HashtoRank <- function(h){
 #'
 #'    Ranking representation encodes the position of objects. Ordering representation is an ordered sequence of objects.
 #'    For example ranking (2 3 1 4) is equivalent to ordering (3 1 2 4), which means object 3 is first, object 1 is second, followed by object 2 and 4.
+#'    Also note that we can use this function to transform rankings into orderings, and applying this function twice will not change the input value.
 #' @param ordering  a matrix of orderings or rankings. Each row contains an observation.
 #' @return  a matrix of transformed rankings or orderings. Each row contains an observation.
 #' @export
@@ -180,7 +181,7 @@ OrderingToRanking <- function(ordering){
 
 #' Fit A Mixture of Distance-based Models
 #' 
-#' \code{RankDistanceModel} fits a mixture of ranking models
+#' \code{RankDistanceModel} fits ranking models based on inputs
 #' 
 #' The procedure will estimate central rankings, the probability of each cluster and weights.
 #' 
@@ -193,7 +194,7 @@ OrderingToRanking <- function(ordering){
 #' \item{\code{modal_ranking.est}}{the estimated modal ranking for each cluster.}
 #' \item{\code{p}}{the marginal probability of each cluster.}
 #' \item{\code{w.est}}{the estimated weights of each cluster.}
-#' \item{\code{param.est}}{the param parametrisation of weights of each cluster.}
+#' \item{\code{param.est}}{the phi parametrisation of weights of each cluster (for Weighted Kendall model only).}
 #' \item{\code{SSR}}{the sum of squares of Pearson residuals}
 #' \item{\code{log_likelihood}}{the fitted log_likelihood}
 #' \item{\code{BIC}}{the fitted Bayesian Information Criterion value}
@@ -202,6 +203,7 @@ OrderingToRanking <- function(ordering){
 #' \item{\code{iteration}}{the number of EM iteration}
 #' \item{\code{model.call}}{the function call}
 #' }
+#' @seealso \code{\link{RankData}}, \code{\link{RankInit}}, \code{\link{RankControl}}
 #' @export
 RankDistanceModel <- function(dat,init,ctrl){
     flag_transform = (min(dat@topq) != dat@nobj - 1)
@@ -344,16 +346,16 @@ RankDistanceModel <- function(dat,init,ctrl){
 }
 
 
-#' Find Initial Values of param
+#' Find Initial Values of phi
 #'
-#' \code{MomentEst} finds the initial values of param which can be used in the subsequent optimization problems.
-#' Linear model is fitted to the log odds of rankings.
+#' \code{MomentsEst} finds the initial values of phi which can be used in the subsequent optimization problems.
+#' Linear model is fitted to the log odds of rankings.This function is only useful to the Weighted Kendall model.
 #' 
 #' @param dat a RankData object
 #' @param size the number of samples to take in the linear model
 #' @param pi0 an optional argument showing the location of central ranking. 
 #' If not provided, Borda Count method is used to estimate the central ranking.
-#' @return estimated param
+#' @return estimated phi
 #' @examples MomentsEst(apa_obj,40)
 #' @export
 MomentsEst <- function(dat,size,pi0=NULL){
@@ -391,6 +393,7 @@ MomentsEst <- function(dat,size,pi0=NULL){
 #' @format a RankData object
 #' 
 #' @references Marden, J. I. (1995). Analyzing and Modeling Rank Data (94-96). Chapman Hall, New York.
+#' @seealso \code{\link{apa_partial_obj}}
 "apa_obj"
 
 #' American Psychological Association (APA) election data (partial rankings included)
@@ -400,5 +403,6 @@ MomentsEst <- function(dat,size,pi0=NULL){
 #' @format a RankData object
 #' 
 #' @references Marden, J. I. (1995). Analyzing and Modeling Rank Data (94-96). Chapman Hall, New York.
+#' @seealso \code{\link{apa_obj}}
 "apa_partial_obj"
 

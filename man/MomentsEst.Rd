@@ -2,7 +2,7 @@
 % Please edit documentation in R/rankdist.R
 \name{MomentsEst}
 \alias{MomentsEst}
-\title{Find Initial Values of param}
+\title{Find Initial Values of phi}
 \usage{
 MomentsEst(dat, size, pi0 = NULL)
 }
@@ -15,11 +15,11 @@ MomentsEst(dat, size, pi0 = NULL)
 If not provided, Borda Count method is used to estimate the central ranking.}
 }
 \value{
-estimated param
+estimated phi
 }
 \description{
-\code{MomentEst} finds the initial values of param which can be used in the subsequent optimization problems.
-Linear model is fitted to the log odds of rankings.
+\code{MomentsEst} finds the initial values of phi which can be used in the subsequent optimization problems.
+Linear model is fitted to the log odds of rankings.This function is only useful to the Weighted Kendall model.
 }
 \examples{
 MomentsEst(apa_obj,40)

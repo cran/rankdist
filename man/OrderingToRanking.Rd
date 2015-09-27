@@ -18,5 +18,6 @@ a matrix of transformed rankings or orderings. Each row contains an observation.
 \details{
 Ranking representation encodes the position of objects. Ordering representation is an ordered sequence of objects.
    For example ranking (2 3 1 4) is equivalent to ordering (3 1 2 4), which means object 3 is first, object 1 is second, followed by object 2 and 4.
+   Also note that we can use this function to transform rankings into orderings, and applying this function twice will not change the input value.
 }
 

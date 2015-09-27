@@ -2,21 +2,19 @@
 % Please edit documentation in R/rankdist.R
 \name{DistanceBlock}
 \alias{DistanceBlock}
-\title{Calculate Kendall distance
-Calculate Kendall distance matrix between one ranking and a matrix of rankings}
+\title{Calculate Kendall distance between one ranking and a matrix of rankings}
 \usage{
 DistanceBlock(mat, r)
 }
 \arguments{
-\item{mat}{a matrix of rankings}
+\item{mat}{a matrix of rankings. Each row stores a ranking.}
 
 \item{r}{a single ranking}
 }
 \value{
-a vector of Kendall distance
+a vector of Kendall distances
 }
 \description{
-Calculate Kendall distance
-Calculate Kendall distance matrix between one ranking and a matrix of rankings
+Calculate Kendall distance between one ranking and a matrix of rankings
 }
 

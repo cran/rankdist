@@ -9,7 +9,10 @@
 A virtual S4 class to store control parameters for model fitting.
 }
 \details{
-RankControl class must be extended to reflect what distance metric should be used. Possibles extensions are \code{\link{RankControlWeightedKendall}}. The control parameters that start with prefix \code{EM_} are intended for the EM iteration. The ones with prefix \code{SeachPi0} control the behaviour of searching model ranking.
+RankControl class must be extended to reflect what distance metric should be used. Possibles extensions are \code{\link{RankControlWeightedKendall}}, \code{\link{RankControlKendall}}, \code{\link{RankControlPhiComponent}},
+\code{\link{RankControlWtau}}, \code{\link{RankControlSpearman}}, \code{\link{RankControlFootrule}}, \code{\link{RankControlHamming}}, and \code{\link{RankControlCayley}}.
+
+The control parameters that start with prefix \code{EM_} are intended for the EM iteration. The ones with prefix \code{SeachPi0} control the behaviour of searching model ranking.
 }
 \section{Slots}{
 
@@ -22,7 +25,7 @@ RankControl class must be extended to reflect what distance metric should be use
 
 \item{\code{SearchPi0_FUN}}{a function object that gives a goodness of fit criterion. The default is log likelihood.}
 
-\item{\code{SearchPi0_fast_traversal}}{a logical value. If TRUE (by default), immediately traverse to the neighbour if it is better than the current pi0. Otherwise, check all neighbours and traverse to the best one.}
+\item{\code{SearchPi0_fast_traversal}}{a logical value. If TRUE (by default), immediately traverse to the neighbour if it is better than the current best. Otherwise, check all neighbours and traverse to the best one.}
 
 \item{\code{SearchPi0_show_message}}{a logical value. If TRUE, the location of the current pi0 is shown.}
 

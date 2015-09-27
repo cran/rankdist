@@ -14,7 +14,7 @@ GenerateExampleTopQ(central = c(1, 2, 3, 4, 4), w = c(0.7, 0.5, 0.3, 0))
 \description{
 This function generates simple examples for illustrative proposes.
 The sample contains the top-3 rankings of five objects and the underlying model is a weighted Kendall distance model
-model with default weights set to (0.7,0.5,0.3,0)
+with default weights set to (0.7,0.5,0.3,0)
 and modal ranking set to (1,2,3,4,4)
 }
 

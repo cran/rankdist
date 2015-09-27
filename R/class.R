@@ -89,11 +89,14 @@ setClass( "RankInit",
 #' @slot EM_epsilon convergence error for weights and cluster probabilities in EM iteration
 #' @slot SearchPi0_limit maximum number of iterations in the local search of pi0.
 #' @slot SearchPi0_FUN a function object that gives a goodness of fit criterion. The default is log likelihood.
-#' @slot SearchPi0_fast_traversal a logical value. If TRUE (by default), immediately traverse to the neighbour if it is better than the current pi0. Otherwise, check all neighbours and traverse to the best one.
+#' @slot SearchPi0_fast_traversal a logical value. If TRUE (by default), immediately traverse to the neighbour if it is better than the current best. Otherwise, check all neighbours and traverse to the best one.
 #' @slot SearchPi0_show_message a logical value. If TRUE, the location of the current pi0 is shown.
 #' @slot SearchPi0_neighbour a character string specifying which type of neighbour to use in the local search. Supported values are: "Cayley" to use neighbours in terms of Cayley distance or "Kendall" to use neighbours in terms of Kendall distance.
 #' Note that Kendall neighbours are a subset of Cayley neighbours
-#' @details RankControl class must be extended to reflect what distance metric should be used. Possibles extensions are \code{\link{RankControlWeightedKendall}}. The control parameters that start with prefix \code{EM_} are intended for the EM iteration. The ones with prefix \code{SeachPi0} control the behaviour of searching model ranking.
+#' @details RankControl class must be extended to reflect what distance metric should be used. Possibles extensions are \code{\link{RankControlWeightedKendall}}, \code{\link{RankControlKendall}}, \code{\link{RankControlPhiComponent}}, 
+#' \code{\link{RankControlWtau}}, \code{\link{RankControlSpearman}}, \code{\link{RankControlFootrule}}, \code{\link{RankControlHamming}}, and \code{\link{RankControlCayley}}.
+#' 
+#' The control parameters that start with prefix \code{EM_} are intended for the EM iteration. The ones with prefix \code{SeachPi0} control the behaviour of searching model ranking.
 #' @section User-defined Criterion:
 #' You can specify user-defined criterion to choose modal rankings. The function object SearchPi0_FUN takes a list as argument. The components in the list include the following. \code{obs}: the number of observations.
 #' \code{w.est}: the estimated weights. \code{log_likelihood}: the estimated log_likelihood. With this information, most of the popular information criterion can be supported and customized criterion can also be defined.
@@ -207,12 +210,21 @@ setClass( "RankControlPhiComponent",
         contains = "RankControl"
 )
 
-#' @title RankControlWdbm Class
+#' @title RankControlWtau Class
 #' @description A S4 class for the Weighted tau model fitting.
 #' It is derived from class \code{\link{RankControl-class}}. 
+#' @slot EM_limit maximum number of EM iteration
+#' @slot EM_epsilon convergence error for weights and cluster probabilities in EM iteration
+#' @slot SearchPi0_limit maximum number of iterations in the local search of pi0.
+#' @slot SearchPi0_FUN a function object that gives a goodness of fit criterion. The default is log likelihood.
+#' @slot SearchPi0_fast_traversal a logical value. If TRUE (by default), immediately traverse to the neighbour if it is better than the current pi0. Otherwise, check all neighbours and traverse to the best one.
+#' @slot SearchPi0_show_message a logical value. If TRUE, the location of the current pi0 is shown.
+#' @slot SearchPi0_neighbour a character string specifying which type of neighbour to use in the local search. Supported values are: "Cayley" to use neighbours in terms of Cayley distance or "Kendall" to use neighbours in terms of Kendall distance.
+#' Note that Kendall neighbours are a subset of Cayley neighbours
+
 #' @slot optimx_control a list to be passed to \code{\link[optimx]{optimx}}. The list must not contain a component \code{maximize=TRUE} since internally the negation of the likelihood function is minimized.
 #' @seealso \code{\link{RankData}}, \code{\link{RankInit}}, \code{\link{RankControl}}
-#' @aliases RankControlWdbm RankControlWdbm-class
+#' @aliases RankControlWtau RankControlWtau-class
 #' @export
 setClass( "RankControlWtau",
           contains = "RankControl",
@@ -227,6 +239,15 @@ setClass( "RankControlWtau",
 #' @title RankControlSpearman Class
 #' @description A S4 class for the Spearman distance model fitting.
 #' It is derived from class \code{\link{RankControl-class}}. 
+#' @slot EM_limit maximum number of EM iteration
+#' @slot EM_epsilon convergence error for weights and cluster probabilities in EM iteration
+#' @slot SearchPi0_limit maximum number of iterations in the local search of pi0.
+#' @slot SearchPi0_FUN a function object that gives a goodness of fit criterion. The default is log likelihood.
+#' @slot SearchPi0_fast_traversal a logical value. If TRUE (by default), immediately traverse to the neighbour if it is better than the current pi0. Otherwise, check all neighbours and traverse to the best one.
+#' @slot SearchPi0_show_message a logical value. If TRUE, the location of the current pi0 is shown.
+#' @slot SearchPi0_neighbour a character string specifying which type of neighbour to use in the local search. Supported values are: "Cayley" to use neighbours in terms of Cayley distance or "Kendall" to use neighbours in terms of Kendall distance.
+#' Note that Kendall neighbours are a subset of Cayley neighbours
+
 #' @seealso \code{\link{RankData}}, \code{\link{RankInit}}, \code{\link{RankControl}}
 #' @aliases RankControlSpearman RankControlSpearman-class
 #' @export
@@ -237,6 +258,15 @@ setClass("RankControlSpearman",
 #' @title RankControlFootrule Class
 #' @description A S4 class for the Footrule distance model fitting.
 #' It is derived from class \code{\link{RankControl-class}}. 
+#' @slot EM_limit maximum number of EM iteration
+#' @slot EM_epsilon convergence error for weights and cluster probabilities in EM iteration
+#' @slot SearchPi0_limit maximum number of iterations in the local search of pi0.
+#' @slot SearchPi0_FUN a function object that gives a goodness of fit criterion. The default is log likelihood.
+#' @slot SearchPi0_fast_traversal a logical value. If TRUE (by default), immediately traverse to the neighbour if it is better than the current pi0. Otherwise, check all neighbours and traverse to the best one.
+#' @slot SearchPi0_show_message a logical value. If TRUE, the location of the current pi0 is shown.
+#' @slot SearchPi0_neighbour a character string specifying which type of neighbour to use in the local search. Supported values are: "Cayley" to use neighbours in terms of Cayley distance or "Kendall" to use neighbours in terms of Kendall distance.
+#' Note that Kendall neighbours are a subset of Cayley neighbours
+
 #' @seealso \code{\link{RankData}}, \code{\link{RankInit}}, \code{\link{RankControl}}
 #' @aliases RankControlFootrule RankControlFootrule-class
 #' @export
@@ -247,6 +277,15 @@ setClass("RankControlFootrule",
 #' @title RankControlHamming Class
 #' @description A S4 class for the Hamming distance model fitting.
 #' It is derived from class \code{\link{RankControl-class}}. 
+#' @slot EM_limit maximum number of EM iteration
+#' @slot EM_epsilon convergence error for weights and cluster probabilities in EM iteration
+#' @slot SearchPi0_limit maximum number of iterations in the local search of pi0.
+#' @slot SearchPi0_FUN a function object that gives a goodness of fit criterion. The default is log likelihood.
+#' @slot SearchPi0_fast_traversal a logical value. If TRUE (by default), immediately traverse to the neighbour if it is better than the current pi0. Otherwise, check all neighbours and traverse to the best one.
+#' @slot SearchPi0_show_message a logical value. If TRUE, the location of the current pi0 is shown.
+#' @slot SearchPi0_neighbour a character string specifying which type of neighbour to use in the local search. Supported values are: "Cayley" to use neighbours in terms of Cayley distance or "Kendall" to use neighbours in terms of Kendall distance.
+#' Note that Kendall neighbours are a subset of Cayley neighbours
+
 #' @seealso \code{\link{RankData}}, \code{\link{RankInit}}, \code{\link{RankControl}}
 #' @aliases RankControlHamming RankControlHamming-class
 #' @export
@@ -257,6 +296,15 @@ setClass("RankControlHamming",
 #' @title RankControlCayley Class
 #' @description A S4 class for the Cayley distance model fitting.
 #' It is derived from class \code{\link{RankControl-class}}. 
+#' @slot EM_limit maximum number of EM iteration
+#' @slot EM_epsilon convergence error for weights and cluster probabilities in EM iteration
+#' @slot SearchPi0_limit maximum number of iterations in the local search of pi0.
+#' @slot SearchPi0_FUN a function object that gives a goodness of fit criterion. The default is log likelihood.
+#' @slot SearchPi0_fast_traversal a logical value. If TRUE (by default), immediately traverse to the neighbour if it is better than the current pi0. Otherwise, check all neighbours and traverse to the best one.
+#' @slot SearchPi0_show_message a logical value. If TRUE, the location of the current pi0 is shown.
+#' @slot SearchPi0_neighbour a character string specifying which type of neighbour to use in the local search. Supported values are: "Cayley" to use neighbours in terms of Cayley distance or "Kendall" to use neighbours in terms of Kendall distance.
+#' Note that Kendall neighbours are a subset of Cayley neighbours
+
 #' @seealso \code{\link{RankData}}, \code{\link{RankInit}}, \code{\link{RankControl}}
 #' @aliases RankControlCayley RankControlCayley-class
 #' @export

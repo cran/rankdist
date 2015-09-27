@@ -15,7 +15,7 @@ GenerateExample(ranking = TRUE, central = 1:5, lambda = 0.2)
 }
 \description{
 This function generates simple examples for illustrative proposes.
-The sample contains the rankings of five objects and the underlying model is a Mallows' phi
+The sample contains rankings of five objects and the underlying model is a Mallows' phi
 model with default dispersion parameter set to 0.2
 and modal ranking set to (1,2,3,4,5)
 }

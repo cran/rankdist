@@ -2,9 +2,7 @@
 % Please edit documentation in R/rankdist.R
 \name{ModelSummary}
 \alias{ModelSummary}
-\title{Print a brief summary of the fitted model
-Print a brief summary of the fitted model. This includes information about goodness
-of fit as well as parameter estimation.}
+\title{Print a brief summary of the fitted model}
 \usage{
 ModelSummary(model)
 }
@@ -12,7 +10,6 @@ ModelSummary(model)
 \item{model}{a ranking model returned by a call to RankDistanceModel function.}
 }
 \description{
-Print a brief summary of the fitted model
 Print a brief summary of the fitted model. This includes information about goodness
 of fit as well as parameter estimation.
 }
