@@ -3,7 +3,7 @@
 #' @description A S4 class to represent ranking data
 #' 
 #' It is well understood that the ranking representation and ordering representation of ranking data can easily be confused.
-#' I thus use a S4 class to store all the information about the ranking data. This can avoid unnecessary confusion.
+#' Package rankdist thus uses a S4 class to store all the information about the ranking data. This can avoid unnecessary confusion.
 #' 
 #' @slot nobj The number of ranked objects. If not provided, it will be inferred as the maximum ranking in the data set. As a result, it must be provided if the data is top-q ranking.
 #' @slot nobs the number of observations. No need to be provided during initialization since it must be equal to the sum of slot \code{count}.

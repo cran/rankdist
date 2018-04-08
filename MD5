@@ -1,10 +1,10 @@
-ee97a477e85f7a1a15204e312c70603b *DESCRIPTION
-8db53cb081a8390d9d419121e61750bb *NAMESPACE
-95092c49e3913354affcd5bee619b892 *R/RcppExports.R
-f4f46ff8e932df6b6f83a2d8ce355fc7 *R/class.R
+d4cad0d105cab3d8972ccd4e7e53519b *DESCRIPTION
+a19d916ed1439e43c94acb29f06a4162 *NAMESPACE
+c9d73479caf27230dfe6f77768980e31 *R/RcppExports.R
+837ba58170972677f70f9d016789e94f *R/class.R
 3fff887b975eb67fe22299448abf4b50 *R/method.R
-bb3f1b7c12fa9d6c641baa498b853b89 *R/rankdist.R
-178c75ee03106ca88e4a7b025af1b76e *R/utils.R
+2b6de9680b4f1933620fca5c0ec1f249 *R/rankdist.R
+12dd8deabf99c6984bc82f64046c095a *R/utils.R
 de16db0b3e386977a6b93dc7cde15118 *data/apa_obj.rda
 cbed800d63a3291a203355bcfa53c594 *data/apa_partial_obj.rda
 8439d7c9a765cc6d478c10991973370d *man/DistanceBlock.Rd
@@ -32,7 +32,8 @@ d4cf8c1a38a188cc53c4cf44551d500a *man/RankDistanceModel.Rd
 43d5f8add111012f30c9e35338b5e58f *man/apa_obj.Rd
 d83f8916f5a5767c38bf3acd0ad79dcc *man/apa_partial_obj.Rd
 38330c28f50e8a3238834de4e1d31432 *man/rankdist-package.Rd
-d7289a46f7340abe42ebb8cace842338 *src/RcppExports.cpp
+7a545f2ec429b274ade9e55d1841f1f4 *src/RcppExports.cpp
+d927da8b9ece512ab4d55d62f741b7a8 *src/rankdist_init.c
 d5f818b2a96230600acd49ad057c0600 *src/utils.cpp
 7667a13889c13f998d92a632fadddf51 *tests/testthat.R
 171cf30c656f498c5f92a4866246f20d *tests/testthat/CayleyNeighbour.rds

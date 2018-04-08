@@ -119,18 +119,18 @@ GenerateExampleTopQ <- function(central=c(1,2,3,4,4),w=c(0.7,0.5,0.3,0)){
 #' Create Hash Value for Ranking
 #'
 #' Sometimes it is handy to deal with rankings as a hash value. \code{RanktoHash} returns hash values for ranks. 
-#' Maximum 52 objects are supported.
+#' Maximum 250 objects are supported.
 #' @param r  a vector or matrix of rankings. Each row of the matrix represents a ranking.
 #'   The ranking should be a integer from one to number of objects. No NA is allowed
 #' @return a vector of character strings representing the hash values.
 #' @seealso \code{\link{HashtoRank}} for a reverse operation.
 #' @export
 RanktoHash <- function(r){
-    char <- c(letters,LETTERS)
+    char <- as.character(1:250)
     if (!is.matrix(r)){
-        a <- paste(char[r],collapse="")
+        a <- paste(char[r],collapse=":")
     } else {
-        a <- apply(r,1,function(x)paste(char[x],collapse=""))
+        a <- apply(r,1,function(x)paste(char[x],collapse=":"))
     }
     as.vector(a,mode="character")
 }
@@ -144,11 +144,11 @@ RanktoHash <- function(r){
 #' @seealso \code{\link{RanktoHash}} for a reverse operation.
 #' @export
 HashtoRank <- function(h){
-    char <- c(letters,LETTERS)
+    char <- as.character(1:250)
     transvec <- seq_along(char)
     names(transvec) <- char
-    nobj <- nchar(h[1])
-    numrank <- transvec[unlist(strsplit(h,split=""))]
+    nobj <- length(unlist(strsplit(h[1],split=":")))
+    numrank <- transvec[unlist(strsplit(h,split=":"))]
     if (length(h)==1){
         as.vector(numrank,mode="numeric")
     } else {
@@ -381,7 +381,7 @@ MomentsEst <- function(dat,size,pi0=NULL){
     }
     param.est <- stats::lm(logodd~design_mat-1)
     param.est <- param.est$coefficients
-    param.est[param.est<0] <- 0
+    param.est[param.est<0] <- 1e-5
     names(param.est) <- NULL
     param.est
 }
