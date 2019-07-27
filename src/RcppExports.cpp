@@ -7,7 +7,7 @@ using namespace Rcpp;
 
 // KendallNeighbour
 NumericMatrix KendallNeighbour(NumericVector rank);
-RcppExport SEXP rankdist_KendallNeighbour(SEXP rankSEXP) {
+RcppExport SEXP _rankdist_KendallNeighbour(SEXP rankSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -18,7 +18,7 @@ END_RCPP
 }
 // CayleyNeighbour
 NumericMatrix CayleyNeighbour(NumericVector rank);
-RcppExport SEXP rankdist_CayleyNeighbour(SEXP rankSEXP) {
+RcppExport SEXP _rankdist_CayleyNeighbour(SEXP rankSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -29,7 +29,7 @@ END_RCPP
 }
 // LogC
 double LogC(NumericVector fai);
-RcppExport SEXP rankdist_LogC(SEXP faiSEXP) {
+RcppExport SEXP _rankdist_LogC(SEXP faiSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -40,7 +40,7 @@ END_RCPP
 }
 // CWeightGivenPi
 NumericVector CWeightGivenPi(NumericVector r1, NumericVector r2);
-RcppExport SEXP rankdist_CWeightGivenPi(SEXP r1SEXP, SEXP r2SEXP) {
+RcppExport SEXP _rankdist_CWeightGivenPi(SEXP r1SEXP, SEXP r2SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -52,7 +52,7 @@ END_RCPP
 }
 // FindV
 NumericMatrix FindV(NumericMatrix obs, NumericVector pi0);
-RcppExport SEXP rankdist_FindV(SEXP obsSEXP, SEXP pi0SEXP) {
+RcppExport SEXP _rankdist_FindV(SEXP obsSEXP, SEXP pi0SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -64,7 +64,7 @@ END_RCPP
 }
 // LogC_Component
 double LogC_Component(NumericVector fai);
-RcppExport SEXP rankdist_LogC_Component(SEXP faiSEXP) {
+RcppExport SEXP _rankdist_LogC_Component(SEXP faiSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -75,7 +75,7 @@ END_RCPP
 }
 // cycle_decomp
 int cycle_decomp(NumericVector comp);
-RcppExport SEXP rankdist_cycle_decomp(SEXP compSEXP) {
+RcppExport SEXP _rankdist_cycle_decomp(SEXP compSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -86,7 +86,7 @@ END_RCPP
 }
 // FindCayley
 NumericVector FindCayley(NumericMatrix obs, NumericVector pi0);
-RcppExport SEXP rankdist_FindCayley(SEXP obsSEXP, SEXP pi0SEXP) {
+RcppExport SEXP _rankdist_FindCayley(SEXP obsSEXP, SEXP pi0SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -98,7 +98,7 @@ END_RCPP
 }
 // Wtau
 NumericMatrix Wtau(NumericMatrix obs, NumericVector pi0);
-RcppExport SEXP rankdist_Wtau(SEXP obsSEXP, SEXP pi0SEXP) {
+RcppExport SEXP _rankdist_Wtau(SEXP obsSEXP, SEXP pi0SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -110,7 +110,7 @@ END_RCPP
 }
 // AllPerms
 NumericMatrix AllPerms(int nobj);
-RcppExport SEXP rankdist_AllPerms(SEXP nobjSEXP) {
+RcppExport SEXP _rankdist_AllPerms(SEXP nobjSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -118,4 +118,23 @@ BEGIN_RCPP
     rcpp_result_gen = Rcpp::wrap(AllPerms(nobj));
     return rcpp_result_gen;
 END_RCPP
+}
+
+static const R_CallMethodDef CallEntries[] = {
+    {"_rankdist_KendallNeighbour", (DL_FUNC) &_rankdist_KendallNeighbour, 1},
+    {"_rankdist_CayleyNeighbour", (DL_FUNC) &_rankdist_CayleyNeighbour, 1},
+    {"_rankdist_LogC", (DL_FUNC) &_rankdist_LogC, 1},
+    {"_rankdist_CWeightGivenPi", (DL_FUNC) &_rankdist_CWeightGivenPi, 2},
+    {"_rankdist_FindV", (DL_FUNC) &_rankdist_FindV, 2},
+    {"_rankdist_LogC_Component", (DL_FUNC) &_rankdist_LogC_Component, 1},
+    {"_rankdist_cycle_decomp", (DL_FUNC) &_rankdist_cycle_decomp, 1},
+    {"_rankdist_FindCayley", (DL_FUNC) &_rankdist_FindCayley, 2},
+    {"_rankdist_Wtau", (DL_FUNC) &_rankdist_Wtau, 2},
+    {"_rankdist_AllPerms", (DL_FUNC) &_rankdist_AllPerms, 1},
+    {NULL, NULL, 0}
+};
+
+RcppExport void R_init_rankdist(DllInfo *dll) {
+    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
 }

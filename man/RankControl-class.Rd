@@ -38,6 +38,9 @@ You can specify user-defined criterion to choose modal rankings. The function ob
 \code{w.est}: the estimated weights. \code{log_likelihood}: the estimated log_likelihood. With this information, most of the popular information criterion can be supported and customized criterion can also be defined.
 A larger returned value indicates a better fit. Note that if you are fitting a mixture model the EM algorithm always tries to maximized the log likelihood. Thus the default value should be used in this case.
 }
+\references{
+Qian Z,  Yu L. H. P (2019) "Weighted Distance-Based Models for Ranking Data Using the R Package rankdist." \emph{Journal of Statistical Software}, \strong{90}(5), 1-31. doi: 10.18637/jss.v090.i05
+}
 \seealso{
 \code{\link{RankData}}, \code{\link{RankInit}}
 }

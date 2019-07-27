@@ -50,6 +50,9 @@ rankmat_total <- cbind(rankmat_in, rankmat)
 countvec_total <- c(countvec,countvec)
 rankdat2 <- new("RankData",ranking=rankmat_total,count=countvec_total, nobj=52, topq=c(10,51))
 }
+\references{
+Qian Z,  Yu L. H. P (2019) "Weighted Distance-Based Models for Ranking Data Using the R Package rankdist." \emph{Journal of Statistical Software}, \strong{90}(5), 1-31. doi: 10.18637/jss.v090.i05
+}
 \seealso{
 \code{\link{RankInit}}, \code{\link{RankControl}}
 }

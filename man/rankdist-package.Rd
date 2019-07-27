@@ -12,8 +12,8 @@ The rankdist package implements distance based probability models for ranking da
 \tabular{ll}{
 Package: \tab rankdist\cr
 Type: \tab Package\cr
-Version: \tab 0.3.1\cr
-Date: \tab 2015-05-01\cr
+Version: \tab 1.1.4\cr
+Date: \tab 2019-07-27\cr
 License: \tab GPL (>= 2)\cr
 }
 Distance based models are effective ways to model ranking data. This package supports models based on Kendall distance and weighted Kendall distance. Mixture models can be easily fitted as well. The package includes a well-studied ranking data set, the APA Election data.
@@ -24,8 +24,9 @@ Zhaozhi Qian
 Maintainer: Zhaozhi Qian <qianzhaozhi@connect.hku.hk>
 }
 \references{
-Alvo, M., & Yu, Philip L.H. (2014), Statistical Methods for Ranking Data
+Qian Z,  Yu L. H. P (2019) "Weighted Distance-Based Models for Ranking Data Using the R Package rankdist." \emph{Journal of Statistical Software}, \strong{90}(5), 1-31. doi: 10.18637/jss.v090.i05
 }
+
 
 \keyword{ package }
 

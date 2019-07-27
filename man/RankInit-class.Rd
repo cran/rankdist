@@ -27,6 +27,9 @@ c1init = new("RankInit",param.init=list(rep(1,4)),
 c2init = new("RankInit",param.init=list(rep(0.1,4),rep(0.1,4)),
      modal_ranking.init = list(c(2,3,4,1,5),c(2,5,1,4,3)),clu=2L,p.init=c(0.5,0.5))
 }
+\references{
+Qian Z,  Yu L. H. P (2019) "Weighted Distance-Based Models for Ranking Data Using the R Package rankdist." \emph{Journal of Statistical Software}, \strong{90}(5), 1-31. doi: 10.18637/jss.v090.i05
+}
 \seealso{
 \code{\link{RankData}}, \code{\link{RankControl}}
 }
